@@ -1,6 +1,7 @@
 package ma.sdia.comptcqrses.commands.aggregates;
 
 import lombok.extern.slf4j.Slf4j;
+import ma.sdia.comptcqrses.commonapi.events.AccountActivatedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -45,6 +46,15 @@ public class AccountAggregate {
         this.balance=event.getBalance();
         this.status=event.getStatus();
         this.currency=event.getCurrency();
+        AggregateLifecycle.apply(new AccountActivatedEvent(
+                event.getId(),
+                AccountStatus.ACTIVATED
+        ));
+    }
+
+    @EventSourcingHandler
+    public void on (AccountActivatedEvent event){
+        this.status=event.getStatus();
     }
     @CommandHandler
     public void handle(CreditAccountCommand command){
